@@ -10,6 +10,9 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 import "./App.css";
 import { type MessageDirection } from "@chatscope/chat-ui-kit-react/src/types/unions";
+import SelectSmall from "./components/SelectSmall";
+
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 type MessageType = {
   message: string;
@@ -23,7 +26,10 @@ type ApiMessageType = {
   role: "assistant" | "user" | "system";
 };
 
+export type ModelType = string;
+
 function App() {
+  const [GPTModel, setGPTModel] = useState<ModelType>("gpt-3.5-turbo");
   const [typing, setTyping] = useState<boolean>(false);
   const [messages, setMessages] = useState<MessageType[]>([
     {
@@ -33,6 +39,12 @@ function App() {
       position: "first",
     },
   ]);
+
+  function handleChangeModel(model: ModelType) {
+    setGPTModel(model);
+    console.log(model);
+  }
+
   const handleSend = async (message: string) => {
     const newMessage: MessageType = {
       message: message,
@@ -59,10 +71,10 @@ function App() {
       return { role: role, content: messageObject.message };
     });
 
-    const systemMessage: ApiMessageType = {
-      role: "system",
-      content: "odpowiadaj zawsze po polsku",
-    };
+    // const systemMessage: ApiMessageType = {
+    //   role: "system",
+    //   content: "odpowiadaj zawsze po polsku",
+    // };
 
     // Here are some helpful rules of thumb for understanding tokens in terms of lengths:
     // 1 token ~= 4 chars in English
@@ -98,14 +110,14 @@ function App() {
     // * prices per 1 million tokens
 
     const apiRequestBody = {
-      model: "gpt-3.5-turbo",
-      messages: [systemMessage, ...apiMessages],
+      model: GPTModel,
+      messages: [...apiMessages],
     };
 
     await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: "Bearer ",
+        Authorization: "Bearer " + API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(apiRequestBody),
@@ -114,7 +126,6 @@ function App() {
         return data.json();
       })
       .then((data) => {
-        console.log(data.choices[0].message.content);
         setMessages((messages) => {
           const gptMessage: MessageType = {
             message: data.choices[0].message.content,
@@ -130,8 +141,9 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <div style={{ position: "relative", height: "800px", width: "700px" }}>
+    <>
+      <div style={{ position: "relative", height: "100%", width: "700px" }}>
+        <SelectSmall onChangeModel={handleChangeModel} />
         <MainContainer>
           <ChatContainer>
             <MessageList
@@ -148,7 +160,7 @@ function App() {
           </ChatContainer>
         </MainContainer>
       </div>
-    </div>
+    </>
   );
 }
 
