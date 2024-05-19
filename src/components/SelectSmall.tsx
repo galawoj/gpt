@@ -3,17 +3,19 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { type ModelType } from "../models/ModelType";
 
 type propsModel = {
-  onChangeModel: (model: string) => void;
+  onChangeModel: (model: ModelType) => void;
 };
 
 export default function SelectSmall({ onChangeModel }: propsModel) {
   const [model, setModel] = React.useState("gpt-3.5-turbo");
 
   const handleChange = (event: SelectChangeEvent) => {
-    setModel(event.target.value);
-    onChangeModel(event.target.value);
+    const eventValue = event.target.value as ModelType;
+    setModel(eventValue);
+    onChangeModel(eventValue);
   };
 
   return (
