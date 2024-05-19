@@ -6,14 +6,13 @@ import { ModelType } from "../models/ModelType";
 type propsType = {
     GPTModel:ModelType,
     chatMessages:MessageType[],
-    messages:MessageType[],
     setMessages: Dispatch<SetStateAction<MessageType[]>>
     setTyping:(typing:boolean)=>void
 }
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-export async function processMessageToChatGPT({GPTModel,chatMessages,messages,setMessages,setTyping}: propsType) {
+export async function processMessageToChatGPT({GPTModel,chatMessages,setMessages,setTyping}: propsType) {
     let apiMessages: ApiMessageType[] = chatMessages.map((messageObject) => {
       let role: "assistant" | "user" | "" = "";
       if (messageObject.sender === "ChatGPT") {
@@ -25,9 +24,15 @@ export async function processMessageToChatGPT({GPTModel,chatMessages,messages,se
     });
 
 
+    // const systemMessage: ApiMessageType = {
+    //   role: "system",
+    //   content: "odpowiadaj zawsze po polsku",
+    // };
+
     const apiRequestBody = {
       model: GPTModel,
       messages: [...apiMessages],
+      //messages: [systemMessage,...apiMessages]
     };
 
     await fetch("https://api.openai.com/v1/chat/completions", {
@@ -58,10 +63,6 @@ export async function processMessageToChatGPT({GPTModel,chatMessages,messages,se
       });
   }
 
-      // const systemMessage: ApiMessageType = {
-    //   role: "system",
-    //   content: "odpowiadaj zawsze po polsku",
-    // };
 
     // Here are some helpful rules of thumb for understanding tokens in terms of lengths:
     // 1 token ~= 4 chars in English
