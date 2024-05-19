@@ -96,3 +96,5 @@ export async function processMessageToChatGPT({GPTModel,chatMessages,setMessages
     //  Input: $0.50 | Output: $1.50*
 
     // * prices per 1 million tokens
+
+    
