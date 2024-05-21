@@ -1,7 +1,9 @@
 import { Dispatch,SetStateAction } from "react";
 import {type ApiMessageType } from "../models/ApiMessageType";
 import {type MessageType } from "../models/MessageType";
-import { ModelType } from "../models/ModelType";
+import {type ModelType } from "../models/ModelType";
+import {type apiRequestBodyType } from "../models/apiRequestBodyType";
+import { fetchGptResponse } from "../api/fetchGptResponse";
 
 type propsType = {
     GPTModel:ModelType,
@@ -29,23 +31,15 @@ export async function processMessageToChatGPT({GPTModel,chatMessages,setMessages
     //   content: "odpowiadaj zawsze po polsku",
     // };
 
-    const apiRequestBody = {
+    const apiRequestBody:apiRequestBodyType = {
       model: GPTModel,
       messages: [...apiMessages],
       //messages: [systemMessage,...apiMessages]
     };
 
-    await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(apiRequestBody),
-    })
-      .then((data) => {
-        return data.json();
-      })
+
+  fetchGptResponse(API_KEY,apiRequestBody)
+
       .then((data) => {
         
         setMessages((messages) => {
